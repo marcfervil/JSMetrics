@@ -1,0 +1,16 @@
+{
+  "name": "js-metrics",
+  "version": "1.0.0",
+  "description": "metrics for js",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "acorn": "^8.0.4",
+    "esprima": "^4.0.1"
+  }
+}
