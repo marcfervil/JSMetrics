@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>JSMetrics</title>
+  
+</head>
+<body>
+    <div id="main">
+    	
+   		<h1>{{ message }}</h1>
+   		<span v-for="metric in metrics">
+      		{{ metric.name }} : {{ metric.value }}
+      		<br>
+    	</span>
+    	<br>
+  		<button v-on:click="fileBrowse">Get Metrics</button>
+    </div>
+</body>
+</html>
+<script type="text/javascript" src="../libs/vue.js"></script>
+<script type="text/javascript">
+	const { ipcRenderer } = require('electron');
+	var mainApp = new Vue({
+		el: '#main',
+		data: {
+			message: 'Metrics: ',
+			metrics: []
+		},
+		methods: {
+			fileBrowse: function () {
+				const ipcRenderer = require('electron').ipcRenderer;
+
+				ipcRenderer.send('selectDirectory');
+
+			}
+		}
+	});
+
+	ipcRenderer.on('metrics', (event, arg) => {
+		console.log(arg);
+  		mainApp.metrics = arg;
+	});
+</script>
