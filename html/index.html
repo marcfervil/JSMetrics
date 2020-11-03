@@ -1,41 +1,75 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <title>JSMetrics</title>
-  
-</head>
-<body>
-    <div id="main">
-    	
-   		<h1>{{ message }}</h1>
-   		<span v-for="metric in metrics">
-      		{{ metric.name }} : {{ metric.value }}
-      		<br>
-    	</span>
-    	<br>
-  		<button v-on:click="fileBrowse">Get Metrics</button>
-    </div>
-</body>
+	<head>
+	    <meta charset="UTF-8">
+	    <title>JSMetrics</title>
+
+	</head>
+	<body>
+	    <div id="main">
+			 <h1 v-if="metrics!=null">{{fileFromPath(metrics.files.path)}}</h1>
+	   	<package style="margin-left:25px" v-if="metrics!=null" v-bind:file-data="metrics.files"></package><br>
+			<button v-on:click="fileBrowse">Get Metrics</button>
+	    </div>
+	</body>
 </html>
 <script type="text/javascript" src="../libs/vue.js"></script>
 <script type="text/javascript">
 	const { ipcRenderer } = require('electron');
+
 	var mainApp = new Vue({
 		el: '#main',
 		data: {
-			message: 'Metrics: ',
-			metrics: []
+			metrics: null
 		},
 		methods: {
 			fileBrowse: function () {
-				const ipcRenderer = require('electron').ipcRenderer;
-
 				ipcRenderer.send('selectDirectory');
-
+			},
+			fileFromPath:function(fullPath){
+				return fullPath.replace(/^.*[\\\/]/, '');
 			}
 		}
 	});
+
+
+	Vue.component('package', {
+
+		props:["file-data"],
+		data: function(){
+			return {
+				expanded:[]
+			}
+		},
+
+		template: `
+			<div >
+				<div v-for="(value, name) in fileData.files" >
+
+					<div v-if='typeof value=="string"'><span>{{value}}</span></div>
+					<div v-else-if='typeof value=="object"'>
+						<b><span v-on:click="if(Object.keys(value.files).length>0)expandFolder(value.path)">{{fileFromPath(value.path)}} ({{Object.keys(value.files).length}})</span></b>
+						<package style="margin-left:25px"v-if="expanded.includes(value.path)" v-bind:file-data="value"></package>
+					</div>
+
+				</div>
+			</div>
+		`,
+		methods: {
+			fileFromPath: function(fullPath){
+				return fullPath.replace(/^.*[\\\/]/, '');
+			},
+			expandFolder: function(file){
+				if(this.expanded.includes(file)){
+					this.expanded.splice(this.expanded.indexOf(file), 1);
+				}else{
+					this.expanded.push(file);
+				}
+			}
+		}
+	})
+
+
 
 	ipcRenderer.on('metrics', (event, arg) => {
 		console.log(arg);
