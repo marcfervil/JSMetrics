@@ -10,13 +10,16 @@
 	</head>
 	<body>
 		<div id="app" class="app">
-			<div id="packageViewer" class="packageViewer">
+			<div id="packageViewer" class="packageViewer fillHeight">
+
 				<h1 v-if="metrics!=null">{{fileFromPath(metrics.files.path)}}</h1><br>
-				<div style="overflow: scroll;height: 100vh">
-				<package style="margin-left:25px;" v-if="metrics!=null" v-bind:file-data="metrics.files"></package><br>
+				<div style="flex: 1;overflow-x: hidden;">
+					<package style="margin-left:25px;" v-if="metrics!=null" v-bind:file-data="metrics.files"></package><br>
 				</div>
 			</div>
-			<metrics v-if="viewMetrics!=null" class="metricsViewer" v-bind:metric-data="viewMetrics"></metrics>
+
+
+			<metrics v-if="viewMetrics!=null" class="metricsViewer fillHeight" v-bind:metric-data="viewMetrics"></metrics>
 		</div>
 	</body>
 </html>
@@ -36,7 +39,7 @@
 		},
 
 		template: `
-			<div>
+			<div >
 
 				<div v-for="(value, name) in fileData.files" >
 
@@ -53,6 +56,7 @@
 					</div>
 
 				</div>
+
 			</div>
 		`,
 		methods: {
@@ -80,7 +84,8 @@
 		props:["metric-data"],
 
 		template: `
-			<div>
+			<div s>
+
 				<h1>{{fileFromPath(metricData.files.path)}} metrics</h1>
 				<h2>Classes: </h2>
 				<div class="classData">
