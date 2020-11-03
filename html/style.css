@@ -1,3 +1,56 @@
 body{
-   background-color: #7986cb;
+   background-color: #ffffff;
+
+   font-family: Roboto;
+   padding: 0px;
+   margin: 0px;
+   overflow: hidden;
+   color: #212121;
+   /*#26a69a*/
+}
+
+.packageViewer{
+   background-color: #eeeeee;
+
+   grid-column: 1;
+   grid-row: 1/4;
+   padding: 10px;
+   height: 100vh;
+
+}
+
+.metricsViewer{
+   background-color: white;
+   height: 100%;
+   grid-column: 2/5;
+   grid-row: 1/4;
+   padding: 10px;
+   height: 100vh;
+
+}
+
+.classData{
+   overflow: scroll;
+   height:100vh;
+}
+
+.packageViewer .file, .packageViewer .folder{
+   margin-top: 5px;
+   color:red;
+}
+
+
+.packageViewer .folderItem:hover{
+   cursor: pointer;
+}
+
+h1{
+   padding: 0px;
+   margin: 0px;
+}
+
+.app{
+   display: grid;
+   grid-auto-columns: 25% 25% 25% 25%;
+   grid-auto-row: 25% 25% 25% 25%;
 }

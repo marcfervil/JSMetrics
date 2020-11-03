@@ -8,7 +8,7 @@ const Store = require('./store.js');
 //console.log(Metrics);
 //	console.log("here?");
 let menuReply = null;
-
+let metrics = null;
 function createWindow () {
 	//console.log("here?");
 	win = new BrowserWindow({
@@ -17,7 +17,7 @@ function createWindow () {
 		webPreferences: {
 			nodeIntegration: true
 		}
-	})
+	});
 	var menu = Menu.buildFromTemplate([
 		{
 			label: app.name,
@@ -58,8 +58,16 @@ function createWindow () {
 					label:'Load Test Project',
 					accelerator: 'Cmd+I',
 					click: ()=> {
-						let metrics = new Metrics("/Users/marcfervil/Documents/School/Software Testing/JSMetrics/Project/wey-master");
-						menuReply.reply('metrics', metrics);
+						//metrics = new Metrics("/Users/marcfervil/Documents/School/Software Testing/JSMetrics/Project/wey-master");
+						menuReply.reply('metrics', "/Users/marcfervil/Documents/School/Software Testing/JSMetrics/Project/wey-master");
+					}
+				},
+				{
+					label:'Refresh',
+					accelerator: 'Cmd+R',
+					click: ()=> {
+						win.reload();
+
 					}
 				},
 			],
@@ -93,8 +101,8 @@ function selectFile(){
 			let path = result.filePaths[0];
 			console.log("path: "+path);
 
-			let metrics = new Metrics(path);
-			menuReply.reply('metrics', metrics);
+			//let metrics = new Metrics(path);
+			menuReply.reply('metrics', path);
 		}
 	});
 }

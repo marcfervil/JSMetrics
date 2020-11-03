@@ -9,14 +9,14 @@ const { readdirSync } = require('fs');
 class Metrics {
 
 	constructor(file){
-	
+
 		//generate file map for project
 		this.files = this.getFileMap(file);
 
 
 		//generate inheritance tree for project using file map
 		this.inheritanceTree = this.getClassHierarchy(this.files.filePaths, this.inheritanceTree);
-		
+
 
 		//generate method metrics using inheritance tree
 		this.methodMetics = {};
@@ -24,7 +24,11 @@ class Metrics {
 			this.methodMetics = this.getMethodMetrics(className, classHierarchy.node, this.methodMetics);
 		}
 
-		
+
+	}
+
+	explorePackage(packageName){
+		return new Metrics(packageName);
 	}
 
 	getAll(){
@@ -39,7 +43,7 @@ class Metrics {
 	// function produces a map of the files / folders in any directory (dir)
 	// each folder in filemap has a list of all the files that it contains (directly and indrectly)
 	getFileMap(dir){
-		
+
 		const files = readdirSync(dir, { withFileTypes: true })
 		let filePaths = [];
 		//filter out any files that are not folders or javascript files
@@ -61,7 +65,7 @@ class Metrics {
 
 
 	getMethodMetrics(className, node, metrics={}){
-		
+
 		metrics[className] = []
 
 
@@ -77,7 +81,7 @@ class Metrics {
 				SwitchStatement: 0,
 				WMC: 0,
 			};
-			
+
 			this.walkAST(methodNode, (node) => {
 				if(methodMetrics[node.type]!=undefined)methodMetrics[node.type] += 1;
 			});
@@ -103,7 +107,7 @@ class Metrics {
 	//function to generate a json that represents class inherieance hierarchy
 	getClassHierarchy(fileNames, hierarchy = {}){
 		//generate ast for fileData
-		
+
 
 		//add child to class's children and recursively set depth and propagate children up inheritance tree
 		let addChild = (parentName, childName, directChild=false) => {
@@ -121,21 +125,21 @@ class Metrics {
 			}
 			return hierarchy[childName].depth;
 		}
-		
+
 		//loop thru file names and create list of classes
-		//This must be done before the direct/indirect children are populated because classes can be defined in any order 
+		//This must be done before the direct/indirect children are populated because classes can be defined in any order
 
 		for(const fileName of fileNames){
 			let fileData = fs.readFileSync(fileName);
 			let ast = acorn.parse(fileData, {ecmaVersion: 2020, allowHashBang:true});
-			
+
 			this.walkAST(ast, (node) => {
 				if(node.type=="ClassDeclaration"){
 					let className = node.id.name;
 					if(hierarchy[className]==undefined){
 						hierarchy[className] = {
-							indirectChildren: [], 
-							directChildren: [], 
+							indirectChildren: [],
+							directChildren: [],
 							parent: node.superClass?.name,
 							node: node,
 							depth: 0
@@ -153,7 +157,7 @@ class Metrics {
 		return hierarchy;
 	}
 
-	
+
 
 	//function that walks Acorn's AST tree given a node, the callback returns the current node
 	walkAST(node, callback){
@@ -174,7 +178,7 @@ class Metrics {
 		}
 	}
 
-	getWMC(className, detailed = false){	
+	getWMC(className, detailed = false){
 		let wmc = 0;
 		for(let method of this.methodMetics[className]){
 			wmc += method.WMC;
@@ -198,11 +202,11 @@ class Metrics {
 	//returns LOC of the project by going thru generated file map
 	getLOC(){
 		let loc = 0;
-		//loop thru fileMap's filePaths. 
-		//The top level filpath contains a list of all the files in the project 
+		//loop thru fileMap's filePaths.
+		//The top level filpath contains a list of all the files in the project
 		for(let fileName of this.files.filePaths){
 			let file = fs.readFileSync(fileName);
-			//parse file with locations so we can see the line ending of each 'program node' 
+			//parse file with locations so we can see the line ending of each 'program node'
 			let ast = acorn.parse(file, {ecmaVersion: 2020, locations: true, allowHashBang:true});
 			//increment loc by the ending line of the program node
 			loc += ast.loc.end.line;

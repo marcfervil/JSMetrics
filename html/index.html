@@ -1,25 +1,110 @@
 <!DOCTYPE html>
 <html>
 	<head>
-	    <meta charset="UTF-8">
-	    <title>JSMetrics</title>
-		 <link rel="stylesheet" href="../html/style.css">
+
+		<meta charset="UTF-8">
+		<title>JSMetrics</title>
+		<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="../html/style.css">
+
 	</head>
 	<body>
-	    <div id="main">
-			 <h1 v-if="metrics!=null">{{fileFromPath(metrics.files.path)}}</h1>
-	   	<package style="margin-left:25px" v-if="metrics!=null" v-bind:file-data="metrics.files"></package><br>
-	    </div>
+		<div id="app" class="app">
+			<div id="packageViewer" class="packageViewer">
+				<h1 v-if="metrics!=null">{{fileFromPath(metrics.files.path)}}</h1><br>
+				<div style="overflow: scroll;height: 100vh">
+				<package style="margin-left:25px;" v-if="metrics!=null" v-bind:file-data="metrics.files"></package><br>
+				</div>
+			</div>
+			<metrics v-if="viewMetrics!=null" class="metricsViewer" v-bind:metric-data="viewMetrics"></metrics>
+		</div>
 	</body>
 </html>
 <script type="text/javascript" src="../libs/vue.js"></script>
+<script src="../libs/fa.js" crossorigin="anonymous"></script>
 <script type="text/javascript">
+	const Metrics = require('../src/metrics.js')
 	const { ipcRenderer } = require('electron');
 
+	Vue.component('package', {
+
+		props:["file-data"],
+		data: function(){
+			return {
+				expanded: []
+			}
+		},
+
+		template: `
+			<div>
+
+				<div v-for="(value, name) in fileData.files" >
+
+					<div v-if='typeof value=="string"' class="file">
+						<span>
+							{{value}}
+						</span>
+					</div>
+					<div v-else-if='typeof value=="object"' class="folder">
+						<b><span class="folderItem" v-on:click="if(Object.keys(value.files).length>0)expandFolder(value.path)">
+							<i class="fas fa-folder"></i> {{fileFromPath(value.path)}}
+						</span></b>
+						<package style="margin-left:25px"v-if="expanded.includes(value.path)" v-bind:file-data="value"></package>
+					</div>
+
+				</div>
+			</div>
+		`,
+		methods: {
+			fileFromPath: function(fullPath){
+				return fullPath.replace(/^.*[\\\/]/, '');
+			},
+			expandFolder: function(file){
+			//	console.log(mainApp.metrics);
+				mainApp.viewMetrics = mainApp.metrics.explorePackage(file);
+				if(this.expanded.includes(file)){
+					this.expanded.splice(this.expanded.indexOf(file), 1);
+				}else{
+					this.expanded.push(file);
+				}
+			}
+		}
+	});
+
+	function fileFromPath (fullPath){
+		return fullPath.replace(/^.*[\\\/]/, '');
+	}
+
+	Vue.component('metrics', {
+
+		props:["metric-data"],
+
+		template: `
+			<div>
+				<h1>{{fileFromPath(metricData.files.path)}} metrics</h1>
+				<h2>Classes: </h2>
+				<div class="classData">
+					<div v-for = "(hiarchy, fileName) in metricData.inheritanceTree" v-if = "typeof fileName == 'string'">
+						{{fileName}}
+					</div>
+				</div>
+			</div>
+		`,
+		methods: {
+			fileFromPath: function(fullPath){
+				return fullPath.replace(/^.*[\\\/]/, '');
+			},
+
+		}
+	});
+
+
+
 	var mainApp = new Vue({
-		el: '#main',
+		el: '#app',
 		data: {
-			metrics: null
+			metrics: null,
+			viewMetrics : null
 		},
 		created: function(){
 			ipcRenderer.send('menu');
@@ -35,46 +120,15 @@
 	});
 
 
-	Vue.component('package', {
-
-		props:["file-data"],
-		data: function(){
-			return {
-				expanded:[]
-			}
-		},
-
-		template: `
-			<div >
-				<div v-for="(value, name) in fileData.files" >
-
-					<div v-if='typeof value=="string"'><span>{{value}}</span></div>
-					<div v-else-if='typeof value=="object"'>
-						<b><span v-on:click="if(Object.keys(value.files).length>0)expandFolder(value.path)">{{fileFromPath(value.path)}} ({{Object.keys(value.files).length}})</span></b>
-						<package style="margin-left:25px"v-if="expanded.includes(value.path)" v-bind:file-data="value"></package>
-					</div>
-
-				</div>
-			</div>
-		`,
-		methods: {
-			fileFromPath: function(fullPath){
-				return fullPath.replace(/^.*[\\\/]/, '');
-			},
-			expandFolder: function(file){
-				if(this.expanded.includes(file)){
-					this.expanded.splice(this.expanded.indexOf(file), 1);
-				}else{
-					this.expanded.push(file);
-				}
-			}
-		}
-	})
 
 
 
 	ipcRenderer.on('metrics', (event, arg) => {
-		console.log(arg);
-  		mainApp.metrics = arg;
+		//console.log("beans");
+	//	console.log(arg);
+
+  		mainApp.metrics = new Metrics(arg);
+		console.log(new Metrics(arg));
+		viewMetrics = mainApp.metrics;
 	});
 </script>
