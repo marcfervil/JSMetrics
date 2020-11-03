@@ -3,13 +3,12 @@
 	<head>
 	    <meta charset="UTF-8">
 	    <title>JSMetrics</title>
-
+		 <link rel="stylesheet" href="../html/style.css">
 	</head>
 	<body>
 	    <div id="main">
 			 <h1 v-if="metrics!=null">{{fileFromPath(metrics.files.path)}}</h1>
 	   	<package style="margin-left:25px" v-if="metrics!=null" v-bind:file-data="metrics.files"></package><br>
-			<button v-on:click="fileBrowse">Get Metrics</button>
 	    </div>
 	</body>
 </html>
@@ -21,6 +20,9 @@
 		el: '#main',
 		data: {
 			metrics: null
+		},
+		created: function(){
+			ipcRenderer.send('menu');
 		},
 		methods: {
 			fileBrowse: function () {
