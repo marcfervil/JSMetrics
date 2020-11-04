@@ -13,20 +13,26 @@
 			<div id="packageViewer" class="packageViewer fillHeight">
 
 				<div class="appHeading2">
-					<h1 v-if="metrics!=null" style="opacity: 0.4;">Files</h1>
+					<h1 style="opacity: 0.4;">Files</h1>
 				</div>
 				<div style="flex: 1;overflow-x: hidden;padding:10px">
-					<package style="margin-left:25px;" v-if="metrics!=null" v-bind:file-data="metrics.files"></package><br>
+					<package v-if="metrics!=null" style="margin-left:25px;"  v-bind:file-data="metrics.files"></package><br>
+					<div v-if="metrics==null" style="opacity: 0.4;">
+						<h3 style="margin:0;padding:0;">It looks like you don't have a project open!</h3><br>
+						To open a project click <a v-on:click="open">here</a> or go to File > Open Project
+					</div>
 				</div>
 			</div>
 
 
 			<metrics v-if="viewMetrics!=null" class="metricsViewer fillHeight" v-bind:metric-data="viewMetrics"></metrics>
+			<about v-else></about>
 		</div>
 	</body>
 </html>
 <script type="text/javascript" src="../libs/vue.js"></script>
 <script src="../libs/fa.js" crossorigin="anonymous"></script>
+<script src="../html/components/about.js" crossorigin="anonymous"></script>
 <script type="text/javascript">
 	const Metrics = require('../src/metrics.js')
 	const { ipcRenderer } = require('electron');
@@ -36,7 +42,8 @@
 		props:["file-data"],
 		data: function(){
 			return {
-				expanded: []
+				expanded: [],
+				click: 0
 			}
 		},
 
@@ -70,13 +77,28 @@
 			},
 			expandFolder: function(file){
 			//	console.log(mainApp.metrics);
-				mainApp.viewMetrics = mainApp.metrics.explorePackage(file);
-				if(this.expanded.includes(file)){
-					this.expanded.splice(this.expanded.indexOf(file), 1);
-				}else{
-					this.expanded.push(file);
-				}
+				if(this.click==2)return;
+				this.click+=1;
+				this.timeout = setTimeout(() => {
+					this.click -=1;
+					if(this.click==1){
+						mainApp.viewMetrics = mainApp.metrics.explorePackage(file);
+						if(!this.expanded.includes(file))this.expanded.push(file);
+						this.click = 0;
+						clearTimeout(this.timeout);
+					}else if(this.click==0){
+						if(this.expanded.includes(file)){
+							this.expanded.splice(this.expanded.indexOf(file), 1);
+						}else{
+							this.expanded.push(file);
+						}
+						this.click = 0;
+						clearTimeout(this.timeout);
+					}
+				}, 200);
+
 			}
+
 		}
 	});
 
@@ -135,6 +157,9 @@
 			},
 			fileFromPath:function(fullPath){
 				return fullPath.replace(/^.*[\\\/]/, '');
+			},
+			oepn: function(){
+				ipcRenderer.send('selectDirectory');
 			}
 		}
 	});
@@ -150,6 +175,6 @@
   		mainApp.metrics = new Metrics(arg, true);
 		//console.log(new Metrics(arg));
 		mainApp.viewMetrics = mainApp.metrics.explorePackage(mainApp.metrics.files.path);
-	
+
 	});
 </script>

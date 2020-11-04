@@ -10,8 +10,8 @@ body{
 }
 hr{
    border: 10px solid green;
-     border-radius: 5px;
-        flex: 1;
+   border-radius: 5px;
+   flex: 1;
 }
 
 .bubble{
@@ -21,7 +21,7 @@ hr{
    padding: 10px;
    float:left;
    margin:10px;
-    border-radius: 5px;
+   border-radius: 5px;
 }
 
 .long{
@@ -34,7 +34,7 @@ hr{
 
    grid-column: 1;
    grid-row: 1/5;
-
+   user-select: none;
 
 
    color: white;
@@ -51,6 +51,11 @@ hr{
 .appHeading{
    padding: 20px;
    background-color: #1e1e1e;
+}
+
+.about{
+   max-width:40%;
+   float: none;
 }
 
 .appHeading2{
@@ -71,12 +76,17 @@ hr{
 
 }
 
+.autoSize{
+   width: auto;
+   height: auto;
+}
+
 .metricsContent{
 
    flex: 1;
    overflow-x: hidden;
    padding: 10px;
-
+   padding-left: 25px;
 }
 
 .packageViewer .file, .packageViewer .folder{
