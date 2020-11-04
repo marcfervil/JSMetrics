@@ -8,32 +8,45 @@ const { readdirSync } = require('fs');
 
 class Metrics {
 
-	constructor(file, includeRoot=false){
+	constructor(file, includeRoot=false, hierarchy={}){
 
 		//generate file map for project
 		this.files = this.getFileMap(file);
 
-		//we include the root of the home package to make it look nice
+		//we include the root of the home package to make it look ~pretty~
 		if(includeRoot)this.files = {"path": file, files: [this.files], filePaths: []};
 
-		console.log(this.files);
 		//generate inheritance tree for project using file map
-		this.inheritanceTree = this.getClassHierarchy(this.files.filePaths, this.inheritanceTree);
+		//if hierarchy is undefined we generate a new inheritanceTree
+		//if it is, we use the provided tree so we can A). save time B). have no references to undefined classes when inspecting subpackages
 
+		//I later realised I cannot recylce the tree :(
+		if(Object.keys(hierarchy).length === 0){
+			console.log("generating new tree");
+			this.inheritanceTree = this.getClassHierarchy(this.files.filePaths, this.inheritanceTree);
+		}else {
+			console.log("recycling tree");
+			this.inheritanceTree = hierarchy;
+		}
+		//console.log(this.inheritanceTree);
 
-		//generate method metrics using inheritance tree
+		//generate method metrics for each class by looping thru inheritanceTree and runnning method metrics on each method in each class
 		this.methodMetics = {};
 		for (let [className, classHierarchy] of Object.entries(this.inheritanceTree)) {
 			this.methodMetics = this.getMethodMetrics(className, classHierarchy.node, this.methodMetics);
 		}
 
-
 	}
 
+	//this method is used to return a new metrics object, while using the current hierarchy for speed and consistancy
 	explorePackage(packageName){
-		return new Metrics(packageName);
+		//Vue converts inheritanceTree to Obeservable?
+		//convert it normal when creating new metrics
+		//console.log(JSON.parse(JSON.stringify(this.inheritanceTree)));
+		return new Metrics(packageName, false, JSON.parse(JSON.stringify(this.inheritanceTree)));
 	}
 
+	//returns a JSON of all metrics
 	getAll(){
 		return [
 			{"name": "LOC", "value": this.getLOC()},
@@ -62,7 +75,7 @@ class Metrics {
 			}
 		});
 
-		//sort files and folders to ensure folders always come first
+		//sort files and folders to ensure folders always come first so file tree looks ~pretty~
 		foldersAndFiles.sort((a,b) => (typeof a == "object") ? -1 : 1);
 
 		//return a file map object where path is the location of the folder,
@@ -71,11 +84,14 @@ class Metrics {
 	}
 
 
+	//given a class name, starting AST node, and a metrics json:
+	//return aforementioned json where each key corrosponds to a class name and the value is a list of method metric objects
 	getMethodMetrics(className, node, metrics={}){
 
+		//create an empty array in (method) metrics JSON to hold method metrics for Class [className]'s method metrics
 		metrics[className] = []
 
-
+		//determines WMC by totaling IfStatements, ForStatements, WhileStatement, etc
 		let getMetrics = (methodNode) => {
 			let methodName = methodNode.key.name;
 			let methodMetrics = {
@@ -89,10 +105,13 @@ class Metrics {
 				WMC: 0,
 			};
 
+			//walk through method's AST, if a statemnt in methodMetrics is found, increment counter for said statement
+			//by the end of this process, we'll have a a json that contains the number of control flow statements / WMC
 			this.walkAST(methodNode, (node) => {
 				if(methodMetrics[node.type]!=undefined)methodMetrics[node.type] += 1;
 			});
 
+			//loop through recorded control flow statements and sum them to determine WMC
 			for (let [metricName, metricValue] of Object.entries(methodMetrics)) {
 				if(typeof metricValue == "number" && metricName!="WMC")methodMetrics.WMC+=metricValue;
 			}
@@ -100,8 +119,9 @@ class Metrics {
 			return methodMetrics;
 		}
 
-		//look for method definitons
+		//look for method definitons inside specified class
 		this.walkAST(node, (node) => {
+			//if we find a method, run metrics to determine WMC and push metrics to metrics JSON
 			if(node.type=="MethodDefinition"){
 				metrics[className].push(getMetrics(node));
 			}
@@ -113,8 +133,8 @@ class Metrics {
 
 	//function to generate a json that represents class inherieance hierarchy
 	getClassHierarchy(fileNames, hierarchy = {}){
-		//generate ast for fileData
 
+		//console.log(hierarchy);
 
 		//add child to class's children and recursively set depth and propagate children up inheritance tree
 		let addChild = (parentName, childName, directChild=false) => {
@@ -185,6 +205,8 @@ class Metrics {
 		}
 	}
 
+	//gets WMC of class by looping through the method metrics for [className]
+	//and returns the total WMC of a class by summing the WMC of all of it's functions
 	getWMC(className, detailed = false){
 		let wmc = 0;
 		for(let method of this.methodMetics[className]){
@@ -193,20 +215,19 @@ class Metrics {
 		return wmc;
 	}
 
+
+	//gets Cyclomatic complexity of a package by summing the WMC of each class in a package
 	getCyclomatic(){
-	//	for
-		//console.log(this.methodMetics);
 		let cyclomatic = 0;
 		for (let [className, methods] of Object.entries(this.methodMetics)) {
 			for(let methodMetrics of methods){
-				//console.log(method);
 				cyclomatic += methodMetrics.WMC;
 			}
 		}
 		return cyclomatic;
 	}
 
-	//returns LOC of the project by going thru generated file map
+	//returns LOC of the project by looping thru generated file map
 	getLOC(){
 		let loc = 0;
 		//loop thru fileMap's filePaths.

@@ -9,24 +9,18 @@
 
 	</head>
 	<body>
-		<div id="app" class="app">
-			<div id="packageViewer" class="packageViewer fillHeight">
+		<div id="app">
 
-				<div class="appHeading2">
-					<h1 style="opacity: 0.4;">Files</h1>
-				</div>
-				<div style="flex: 1;overflow-x: hidden;padding:10px">
-					<package v-if="metrics!=null" style="margin-left:25px;"  v-bind:file-data="metrics.files"></package><br>
-					<div v-if="metrics==null" style="opacity: 0.4;">
-						<h3 style="margin:0;padding:0;">It looks like you don't have a project open!</h3><br>
-						To open a project click <a v-on:click="open">here</a> or go to File > Open Project
-					</div>
-				</div>
+			<div v-if="view==1" class="app">
+				<filebrowser style="grid-column: 1;grid-row: 1/5;" v-bind:project="projectMetrics"></filebrowser>
+				<metrics class="metricsViewer fillHeight full" v-bind:metric-data="metricViews.view1"></metrics>
 			</div>
 
-
-			<metrics v-if="viewMetrics!=null" class="metricsViewer fillHeight" v-bind:metric-data="viewMetrics"></metrics>
-			<about v-else></about>
+			<div v-else-if="view==2" class="app">
+				<filebrowser style="grid-column: 1;grid-row: 1/5;" v-bind:project="projectMetrics"></filebrowser>
+				<metrics class="metricsViewer fillHeight halfLeft" v-bind:metric-data="metricViews.view1"></metrics>
+				<metrics class="metricsViewer fillHeight halfRight" v-bind:metric-data="metricViews.view2"></metrics>
+			</div>
 		</div>
 	</body>
 </html>
@@ -34,8 +28,10 @@
 <script src="../libs/fa.js" crossorigin="anonymous"></script>
 <script src="../html/components/about.js" crossorigin="anonymous"></script>
 <script type="text/javascript">
-	const Metrics = require('../src/metrics.js')
+	const Metrics = require('../src/metrics.js');
 	const { ipcRenderer } = require('electron');
+//
+
 
 	Vue.component('package', {
 
@@ -48,18 +44,18 @@
 		},
 
 		template: `
-			<div  >
+			<div>
 
 				<div v-for="(value, name) in fileData.files">
 					<div v-if='typeof value=="string"' class="file">
-						<span style="opacity: 0.5;">
+						<span style="opacity: 0.5;white-space: nowrap; ">
 							&nbsp;&nbsp;&nbsp;&nbsp;<i class="far fa-file-code"></i> {{value}}
 						</span>
 					</div>
 					<div v-else-if='typeof value=="object"' class="folder">
 						<i v-if="expanded.includes(value.path)" style="opacity: 0.5;" class= "fas fa-angle-up fa-rotate-180"></i>
 						<i v-else style="opacity: 0.5;" class= "fas fa-angle-up fa-rotate-90"></i>
-						<span style="opacity: 0.5;"class="folderItem" v-on:click="expandFolder(value.path)">
+						<span style="opacity: 0.5;"class="folderItem" v-on:click="expandFolder(value.path)" @contextmenu="rightClick($event, value.path)">
 							<i class="fas fa-folder"></i> {{fileFromPath(value.path)}}
 						</span>
 						<package style="margin-left:25px"v-if="expanded.includes(value.path)" v-bind:file-data="value"></package>
@@ -75,17 +71,23 @@
 			fileFromPath: function(fullPath){
 				return fullPath.replace(/^.*[\\\/]/, '');
 			},
+			rightClick: function(event, file){
+					//event.preventDefault();
+				ipcRenderer.send("rightClick", {x:event.y,y:event.x}, file);
+			},
 			expandFolder: function(file){
-			//	console.log(mainApp.metrics);
+				//console.log(this.fileData);
 				if(this.click==2)return;
 				this.click+=1;
 				this.timeout = setTimeout(() => {
-					this.click -=1;
+					this.click -= 1;
+					//double click
 					if(this.click==1){
-						mainApp.viewMetrics = mainApp.metrics.explorePackage(file);
+						mainApp.metricViews.view1 = mainApp.projectMetrics.explorePackage(file);
 						if(!this.expanded.includes(file))this.expanded.push(file);
 						this.click = 0;
 						clearTimeout(this.timeout);
+						//single click
 					}else if(this.click==0){
 						if(this.expanded.includes(file)){
 							this.expanded.splice(this.expanded.indexOf(file), 1);
@@ -108,27 +110,31 @@
 
 	Vue.component('metrics', {
 
-		props:["metric-data"],
+		props:["metricData"],
 
 		template: `
 			<div>
 
-				<div class="appHeading"><h1>{{fileFromPath(metricData.files.path)}} metrics</h1></div>
+				<div class="appHeading">
+					<h1 v-if="metricData!=null">{{fileFromPath(metricData.files.path)}} metrics</h1>
+					<h1 v-else>JSMetrics</h1>
+				</div>
 
-				<div class="metricsContent">
+				<div v-if="metricData!=null" class="metricsContent">
 					<h2>Metrics </h2>
 					<span class="bubble" v-for = "metric in metricData.getAll()">
 						<span style="opacity:0.5;">{{metric.name}}</span> <br> <h1>{{metric.value}}</h1> <br>
 					</span>
 					<br style="clear:both">
 
-					<h2>Classes </h2>
+					<h2 v-if="Object.keys(metricData.inheritanceTree).length>0">Classes </h2>
 					<div>
 						<span class="bubble long" v-for = "(hiarchy, fileName) in metricData.inheritanceTree" v-if = "typeof fileName == 'string'">
 							<span style="opacity:0.5;">Class</span> <br> <h3>{{fileName}}</h3> <br>
 						</span>
 					</div>
 				</div>
+				<about v-else></about>
 
 			</div>
 		`,
@@ -137,44 +143,80 @@
 				return fullPath.replace(/^.*[\\\/]/, '');
 			},
 
-		}
+		},
+
+
 	});
 
 
+	Vue.component('filebrowser', {
 
-	var mainApp = new Vue({
-		el: '#app',
-		data: {
-			metrics: null,
-			viewMetrics : null
-		},
-		created: function(){
-			ipcRenderer.send('menu');
-		},
+		props:["project"],
+
+		template: `
+			<div id="packageViewer" class="packageViewer fillHeight">
+
+				<div class="appHeading2">
+					<h1 style="opacity: 0.4;">Files</h1>
+				</div>
+				<div style="flex: 1;overflow-x: scroll;padding:10px">
+					<package v-if="project!=null" style="margin-left:25px;"  v-bind:file-data="project.files"></package><br>
+					<div v-if="project==null" style="opacity: 0.4;">
+						<h3 style="margin:0;padding:0;">You don't have a project open!</h3><br>
+						To open a project click <a v-on:click="open">here</a> or go to File > Open Project
+					</div>
+				</div>
+			</div>
+		`,
 		methods: {
+			fileFromPath: function(fullPath){
+				return fullPath.replace(/^.*[\\\/]/, '');
+			},
 			fileBrowse: function () {
 				ipcRenderer.send('selectDirectory');
 			},
-			fileFromPath:function(fullPath){
-				return fullPath.replace(/^.*[\\\/]/, '');
-			},
-			oepn: function(){
+			open: function(){
 				ipcRenderer.send('selectDirectory');
 			}
 		}
 	});
 
 
+	var mainApp = new Vue({
+		el: '#app',
+		data: {
+			projectMetrics: null,
+			view: 1,
+			metricViews : {
+				view1: null,
+				view2: null
+			},
+		},
+		created: function(){
+			ipcRenderer.send('menu');
+		},
+		methods: {
+
+			fileFromPath:function(fullPath){
+				return fullPath.replace(/^.*[\\\/]/, '');
+			},
+
+		}
+	});
 
 
 
-	ipcRenderer.on('metrics', (event, arg) => {
+
+
+	ipcRenderer.on('metrics', (event, metricPath, view) => {
 		//console.log("beans");
 	//	console.log(arg);
+		//console.log(view);
+  		if(mainApp.projectMetrics == null) {
+			mainApp.projectMetrics = new Metrics(metricPath, true);
+		}
 
-  		mainApp.metrics = new Metrics(arg, true);
-		//console.log(new Metrics(arg));
-		mainApp.viewMetrics = mainApp.metrics.explorePackage(mainApp.metrics.files.path);
-
+		mainApp.metricViews[view] = mainApp.projectMetrics.explorePackage(metricPath);
+		if(view=="view2" && mainApp.view==1) mainApp.view=2;
 	});
 </script>

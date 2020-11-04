@@ -1,14 +1,17 @@
 
 
 
-const { app, BrowserWindow, Menu } = require('electron')
+const { app, BrowserWindow, Menu,MenuItem } = require('electron')
 const Metrics = require('./metrics.js')
 const Store = require('./store.js');
+
+const remote = require("electron").remote;
 
 //console.log(Metrics);
 //	console.log("here?");
 let menuReply = null;
 let metrics = null;
+let win = null;
 function createWindow () {
 	//console.log("here?");
 	win = new BrowserWindow({
@@ -59,7 +62,7 @@ function createWindow () {
 					accelerator: 'Cmd+I',
 					click: ()=> {
 						//metrics = new Metrics("/Users/marcfervil/Documents/School/Software Testing/JSMetrics/Project/wey-master");
-						menuReply.reply('metrics', "/Users/marcfervil/Documents/School/Software Testing/JSMetrics/Project/wey-master");
+						menuReply.reply('metrics', "/Users/marcfervil/Documents/School/Software Testing/JSMetrics/Project/wey-master", "view1");
 					}
 				},
 				{
@@ -117,6 +120,34 @@ ipcMain.on('selectDirectory', async function(event, arg) {
 
 
 });
+
+ipcMain.on('rightClick', async function(event, mousePos, file) {
+
+	const menu = new Menu()
+	const currentTab = new MenuItem({
+		label: 'Open In Current Tab',
+		click: () => {
+			//win.inspectElement(arg.x, arg.y)
+			console.log(file);
+			event.reply("metrics", file, "view1")
+		}
+	});
+	const newTab = new MenuItem({
+		label: 'Open In New Tab',
+		click: () => {
+			event.reply("metrics", file, "view2");
+		}
+	});
+	menu.append(currentTab);
+	menu.append(newTab);
+//	menu.append()
+	rightClickPosition = {x: mousePos.x, y: mousePos.y};
+	menu.popup(win);
+
+
+});
+
+
 
 
 app.whenReady().then(createWindow)

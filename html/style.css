@@ -29,11 +29,17 @@ hr{
    height: 80px;
 }
 
+.fullRight{
+   grid-column: 1;
+   grid-row: 1/5;
+}
+
 .packageViewer{
    background-color: #332940;
 
+   /*
    grid-column: 1;
-   grid-row: 1/5;
+   grid-row: 1/5;*/
    user-select: none;
 
 
@@ -64,11 +70,32 @@ hr{
    background-color: #241b2d;
 }
 
+a{
+    text-decoration: underline;
+}
+
+a:hover{
+   cursor: pointer;
+}
+
+.full{
+   grid-column: 2/4;
+   grid-row: 1/5;
+}
+
+.halfLeft{
+   grid-column: 2/3;
+   grid-row: 1/5;
+}
+
+.halfRight{
+   grid-column: 3/4;
+   grid-row: 1/5;
+}
 
 .metricsViewer{
 
-   grid-column: 2/5;
-   grid-row: 1/5;
+
 
    color: white;
    opacity: 0.7;
@@ -85,6 +112,7 @@ hr{
 
    flex: 1;
    overflow-x: hidden;
+
    padding: 10px;
    padding-left: 25px;
 }
@@ -97,6 +125,7 @@ hr{
 
 .packageViewer .folderItem:hover{
    cursor: pointer;
+
 }
 
 h1{
@@ -110,6 +139,6 @@ h1{
    display: grid;
    width: 100%;
    height: 100vh;
-   grid-auto-columns: 25% 25% 25% 25%;
+   grid-auto-columns: 20% 40% 40%  ;
    grid-template-rows: 25% 25% 25% 25%;
 }
