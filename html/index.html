@@ -12,8 +12,10 @@
 		<div id="app" class="app">
 			<div id="packageViewer" class="packageViewer fillHeight">
 
-				<h1 v-if="metrics!=null">{{fileFromPath(metrics.files.path)}}</h1><br>
-				<div style="flex: 1;overflow-x: hidden;">
+				<div class="appHeading2">
+					<h1 v-if="metrics!=null" style="opacity: 0.4;">Files</h1>
+				</div>
+				<div style="flex: 1;overflow-x: hidden;padding:10px">
 					<package style="margin-left:25px;" v-if="metrics!=null" v-bind:file-data="metrics.files"></package><br>
 				</div>
 			</div>
@@ -39,23 +41,26 @@
 		},
 
 		template: `
-			<div >
+			<div  >
 
-				<div v-for="(value, name) in fileData.files" >
-
+				<div v-for="(value, name) in fileData.files">
 					<div v-if='typeof value=="string"' class="file">
-						<span>
-							{{value}}
+						<span style="opacity: 0.5;">
+							&nbsp;&nbsp;&nbsp;&nbsp;<i class="far fa-file-code"></i> {{value}}
 						</span>
 					</div>
 					<div v-else-if='typeof value=="object"' class="folder">
-						<b><span class="folderItem" v-on:click="if(Object.keys(value.files).length>0)expandFolder(value.path)">
+						<i v-if="expanded.includes(value.path)" style="opacity: 0.5;" class= "fas fa-angle-up fa-rotate-180"></i>
+						<i v-else style="opacity: 0.5;" class= "fas fa-angle-up fa-rotate-90"></i>
+						<span style="opacity: 0.5;"class="folderItem" v-on:click="expandFolder(value.path)">
 							<i class="fas fa-folder"></i> {{fileFromPath(value.path)}}
-						</span></b>
+						</span>
 						<package style="margin-left:25px"v-if="expanded.includes(value.path)" v-bind:file-data="value"></package>
 					</div>
 
 				</div>
+
+
 
 			</div>
 		`,
@@ -84,15 +89,25 @@
 		props:["metric-data"],
 
 		template: `
-			<div s>
+			<div>
 
-				<h1>{{fileFromPath(metricData.files.path)}} metrics</h1>
-				<h2>Classes: </h2>
-				<div class="classData">
-					<div v-for = "(hiarchy, fileName) in metricData.inheritanceTree" v-if = "typeof fileName == 'string'">
-						{{fileName}}
+				<div class="appHeading"><h1>{{fileFromPath(metricData.files.path)}} metrics</h1></div>
+
+				<div class="metricsContent">
+					<h2>Metrics </h2>
+					<span class="bubble" v-for = "metric in metricData.getAll()">
+						<span style="opacity:0.5;">{{metric.name}}</span> <br> <h1>{{metric.value}}</h1> <br>
+					</span>
+					<br style="clear:both">
+
+					<h2>Classes </h2>
+					<div>
+						<span class="bubble long" v-for = "(hiarchy, fileName) in metricData.inheritanceTree" v-if = "typeof fileName == 'string'">
+							<span style="opacity:0.5;">Class</span> <br> <h3>{{fileName}}</h3> <br>
+						</span>
 					</div>
 				</div>
+
 			</div>
 		`,
 		methods: {
@@ -132,8 +147,9 @@
 		//console.log("beans");
 	//	console.log(arg);
 
-  		mainApp.metrics = new Metrics(arg);
-		console.log(new Metrics(arg));
-		viewMetrics = mainApp.metrics;
+  		mainApp.metrics = new Metrics(arg, true);
+		//console.log(new Metrics(arg));
+		mainApp.viewMetrics = mainApp.metrics.explorePackage(mainApp.metrics.files.path);
+	
 	});
 </script>

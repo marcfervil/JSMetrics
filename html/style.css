@@ -1,5 +1,5 @@
 body{
-   background-color: #ffffff;
+   background-color: #292929;
 
    font-family: Roboto;
    padding: 0px;
@@ -8,13 +8,36 @@ body{
    color: #212121;
    /*#26a69a*/
 }
+hr{
+   border: 10px solid green;
+     border-radius: 5px;
+        flex: 1;
+}
+
+.bubble{
+   background-color: #1e1e1e;
+   width: 100px;
+   height: 100px;
+   padding: 10px;
+   float:left;
+   margin:10px;
+    border-radius: 5px;
+}
+
+.long{
+   width:200px;
+   height: 80px;
+}
 
 .packageViewer{
-   background-color: #eeeeee;
+   background-color: #332940;
 
    grid-column: 1;
    grid-row: 1/5;
-   padding: 10px;
+
+
+
+   color: white;
 
 
 }
@@ -25,28 +48,39 @@ body{
 
 }
 
+.appHeading{
+   padding: 20px;
+   background-color: #1e1e1e;
+}
+
+.appHeading2{
+   padding: 20px;
+
+   background-color: #241b2d;
+}
+
+
 .metricsViewer{
-   background-color: white;
+
    grid-column: 2/5;
    grid-row: 1/5;
-   padding: 10px;
 
-   background-color: red;
+   color: white;
+   opacity: 0.7;
 
 
 }
 
-.classData{
+.metricsContent{
 
    flex: 1;
    overflow-x: hidden;
-   background-color: blue;
+   padding: 10px;
 
 }
 
 .packageViewer .file, .packageViewer .folder{
    margin-top: 5px;
-   color:red;
 
 }
 
@@ -56,11 +90,13 @@ body{
 }
 
 h1{
+
    padding: 0px;
    margin: 0px;
 }
 
 .app{
+
    display: grid;
    width: 100%;
    height: 100vh;

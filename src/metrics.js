@@ -8,12 +8,15 @@ const { readdirSync } = require('fs');
 
 class Metrics {
 
-	constructor(file){
+	constructor(file, includeRoot=false){
 
 		//generate file map for project
 		this.files = this.getFileMap(file);
 
+		//we include the root of the home package to make it look nice
+		if(includeRoot)this.files = {"path": file, files: [this.files], filePaths: []};
 
+		console.log(this.files);
 		//generate inheritance tree for project using file map
 		this.inheritanceTree = this.getClassHierarchy(this.files.filePaths, this.inheritanceTree);
 
@@ -36,7 +39,7 @@ class Metrics {
 			{"name": "LOC", "value": this.getLOC()},
 			{"name": "DIT", "value": this.getDIT()},
 			{"name": "NOC", "value": this.getNOC()},
-			{"name": "Sum Cyclomatic", "value": this.getCyclomatic()},
+			{"name": "Cyclomatic", "value": this.getCyclomatic()},
 		]
 	}
 
@@ -58,6 +61,10 @@ class Metrics {
 				return dirent.name;
 			}
 		});
+
+		//sort files and folders to ensure folders always come first
+		foldersAndFiles.sort((a,b) => (typeof a == "object") ? -1 : 1);
+
 		//return a file map object where path is the location of the folder,
 		//files is a list of the files and folders, and filePaths is a list of all the files that the folder contains (directly and indrectly)
 		return {"path": dir, files: foldersAndFiles, filePaths: filePaths};
