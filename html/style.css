@@ -83,14 +83,28 @@ a:hover{
    grid-row: 1/5;
 }
 
+
+
 .halfLeft{
    grid-column: 2/3;
-   grid-row: 1/5;
+   grid-row: 1;
+   grid-row-end: 5;
 }
 
 .halfRight{
    grid-column: 3/4;
-   grid-row: 1/5;
+   grid-row: 1;
+   grid-row-end: 5;
+}
+
+.pullUp{
+   grid-row-end: 3;
+}
+
+
+.bottomFull{
+   grid-column: 2/4;
+   grid-row: 3/5;
 }
 
 .metricsViewer{
@@ -101,6 +115,37 @@ a:hover{
    opacity: 0.7;
 
 
+}
+
+.barGraphText{
+   opacity: 0.7;
+}
+
+.barGraphBar{
+
+   margin-top: 3px;
+   opacity:1;
+   color: #bb86fc;
+   background-color:#bb86fc;
+   z-index: 100;
+}
+
+.barGraphLines{
+   position: absolute;
+   z-index: -1;
+   top: 22px;
+   left: 16px;
+   width: 50%;
+   height: 80%;
+   opacity: 0.3;
+   border-left: 2px dotted white;
+   width: 16px;
+   font-size: 12px;
+}
+
+.weak{
+   opacity:0.2;
+   border-left: 1px dotted white;
 }
 
 .autoSize{

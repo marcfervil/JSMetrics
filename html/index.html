@@ -13,7 +13,9 @@
 
 			<div v-if="view==1" class="app">
 				<filebrowser style="grid-column: 1;grid-row: 1/5;" v-bind:project="projectMetrics"></filebrowser>
+
 				<metrics class="metricsViewer fillHeight full" v-bind:metric-data="metricViews.view1"></metrics>
+
 			</div>
 
 			<div v-else-if="view==2" class="app">
@@ -21,11 +23,21 @@
 				<metrics class="metricsViewer fillHeight halfLeft" v-bind:metric-data="metricViews.view1"></metrics>
 				<metrics class="metricsViewer fillHeight halfRight" v-bind:metric-data="metricViews.view2"></metrics>
 			</div>
+
+			<div v-else-if="view==3" class="app">
+				<filebrowser style="grid-column: 1;grid-row: 1/5;" v-bind:project="projectMetrics"></filebrowser>
+				<graph class="metricsViewer fillHeight bottomFull"></graph>
+				<metrics class="metricsViewer fillHeight halfLeft pullUp" v-bind:metric-data="metricViews.view1"></metrics>
+				<metrics class="metricsViewer fillHeight halfRight pullUp" v-bind:metric-data="metricViews.view2"></metrics>
+			</div>
+
+
 		</div>
 	</body>
 </html>
 <script type="text/javascript" src="../libs/vue.js"></script>
 <script src="../libs/fa.js" crossorigin="anonymous"></script>
+<script src="../html/components/graph.js" crossorigin="anonymous"></script>
 <script src="../html/components/about.js" crossorigin="anonymous"></script>
 <script type="text/javascript">
 	const Metrics = require('../src/metrics.js');
@@ -186,7 +198,7 @@
 		el: '#app',
 		data: {
 			projectMetrics: null,
-			view: 1,
+			view: 3,
 			metricViews : {
 				view1: null,
 				view2: null

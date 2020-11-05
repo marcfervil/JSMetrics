@@ -28,7 +28,7 @@ class Metrics {
 			console.log("recycling tree");
 			this.inheritanceTree = hierarchy;
 		}
-		//console.log(this.inheritanceTree);
+
 
 		//generate method metrics for each class by looping thru inheritanceTree and runnning method metrics on each method in each class
 		this.methodMetics = {};

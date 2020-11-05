@@ -63,6 +63,7 @@ function createWindow () {
 					click: ()=> {
 						//metrics = new Metrics("/Users/marcfervil/Documents/School/Software Testing/JSMetrics/Project/wey-master");
 						menuReply.reply('metrics', "/Users/marcfervil/Documents/School/Software Testing/JSMetrics/Project/wey-master", "view1");
+						menuReply.reply('metrics', "/Users/marcfervil/Documents/School/Software Testing/JSMetrics/Project/wey-master/lib/view", "view2");
 					}
 				},
 				{
