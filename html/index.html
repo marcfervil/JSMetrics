@@ -26,7 +26,7 @@
 
 			<div v-else-if="view==3" class="app">
 				<filebrowser style="grid-column: 1;grid-row: 1/5;" v-bind:project="projectMetrics"></filebrowser>
-				<graph class="metricsViewer fillHeight bottomFull"></graph>
+				<graph :package1="metricViews.view1" :package2="metricViews.view1"  metric="LOC" class="metricsViewer fillHeight bottomFull"></graph>
 				<metrics class="metricsViewer fillHeight halfLeft pullUp" v-bind:metric-data="metricViews.view1"></metrics>
 				<metrics class="metricsViewer fillHeight halfRight pullUp" v-bind:metric-data="metricViews.view2"></metrics>
 			</div>
@@ -42,7 +42,7 @@
 <script type="text/javascript">
 	const Metrics = require('../src/metrics.js');
 	const { ipcRenderer } = require('electron');
-//
+
 
 
 	Vue.component('package', {

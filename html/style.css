@@ -118,7 +118,20 @@ a:hover{
 }
 
 .barGraphText{
-   opacity: 0.7;
+   opacity: 0.5;
+   font-size: 12px;
+
+}
+
+.barGraphLine{
+   border-left: 2px dotted white;
+   opacity: 0.5;
+
+}
+
+.barGraphHeadingText{
+
+   z-index: 111;
 }
 
 .barGraphBar{
@@ -128,8 +141,10 @@ a:hover{
    color: #bb86fc;
    background-color:#bb86fc;
    z-index: 100;
+
 }
 
+/*
 .barGraphLines{
    position: absolute;
    z-index: -1;
@@ -141,11 +156,45 @@ a:hover{
    border-left: 2px dotted white;
    width: 16px;
    font-size: 12px;
+}*/
+
+.barGraphOverlay{
+   position: absolute;
+
+   top: 0px;
+   left: 20px;
+   z-index: -1;
+   width:85%;
+   height: 100%;
+
+
 }
+
+
+
+.barGraphContent{
+   display: grid;
+
+   grid-template-columns: repeat(20, 5%);
+   grid-template-rows: repeat(20, 5%);
+
+
+   /*
+
+   20 = 100 %
+   10 = 50 %
+
+   grid-auto-columns: 10% 10% 10% 10% 10% 10% 10% 10% 10% 10%;
+   grid-template-rows: 10% 10% 10% 10% 10% 10% 10% 10% 10% 10%;
+*/
+   width: 100%;
+   height: 100%;
+}
+
 
 .weak{
    opacity:0.2;
-   border-left: 1px dotted white;
+
 }
 
 .autoSize{
