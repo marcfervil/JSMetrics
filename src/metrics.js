@@ -14,7 +14,7 @@ class Metrics {
 		this.files = this.getFileMap(file);
 
 		//we include the root of the home package to make it look ~pretty~
-		if(includeRoot)this.files = {"path": file, files: [this.files], filePaths: []};
+		if(includeRoot)this.files = {"path": file, files: [this.files], filePaths: this.files.filePaths};
 
 		//generate inheritance tree for project using file map
 		//if hierarchy is undefined we generate a new inheritanceTree
@@ -46,8 +46,16 @@ class Metrics {
 		return new Metrics(packageName, false, JSON.parse(JSON.stringify(this.inheritanceTree)));
 	}
 
-	//returns a JSON of all metrics
-	getAll(){
+	//returns a JSON of all metrics, or a list of the properties of said json
+	getAll(asJSON=false){
+		if(asJSON){
+			return {
+				"LOC":  this.getLOC(),
+				"DIT": this.getDIT(),
+				"NOC": this.getNOC(),
+				"Cyclomatic": this.getCyclomatic()
+			}
+		}
 		return [
 			{"name": "LOC", "value": this.getLOC()},
 			{"name": "DIT", "value": this.getDIT()},
