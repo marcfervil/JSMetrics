@@ -14,20 +14,25 @@ class Metrics {
 		this.files = this.getFileMap(file);
 
 		//we include the root of the home package to make it look ~pretty~
-		if(includeRoot)this.files = {"path": file, files: [this.files], filePaths: this.files.filePaths};
+		if(includeRoot){
+			this.files = {"path": file, files: [this.files], filePaths: this.files.filePaths};
+		}
 
 		//generate inheritance tree for project using file map
 		//if hierarchy is undefined we generate a new inheritanceTree
 		//if it is, we use the provided tree so we can A). save time B). have no references to undefined classes when inspecting subpackages
 
 		//I later realised I cannot recylce the tree :(
+		this.inheritanceTree = this.getClassHierarchy(this.files.filePaths, this.inheritanceTree);
+
+		/*
 		if(Object.keys(hierarchy).length === 0){
 			console.log("generating new tree");
-			this.inheritanceTree = this.getClassHierarchy(this.files.filePaths, this.inheritanceTree);
+
 		}else {
 			console.log("recycling tree");
 			this.inheritanceTree = hierarchy;
-		}
+		}*/
 
 
 		//generate method metrics for each class by looping thru inheritanceTree and runnning method metrics on each method in each class

@@ -48,6 +48,37 @@ function createWindow () {
 			],
 		},
 		{
+			label: "Graph",
+			submenu: [
+				{
+					label:'LOC',
+					click: ()=> {
+						menuReply.reply('graph', "LOC");
+					}
+				},
+				{
+					label:'DIT',
+					click: ()=> {
+							menuReply.reply('graph', "DIT");
+					}
+				},
+
+				{
+					label:'NOC',
+					click: ()=> {
+							menuReply.reply('graph', "NOC");
+					}
+				},
+
+				{
+					label:'Cyclomatic Complexity',
+					click: ()=> {
+							menuReply.reply('graph', "Cyclomatic");
+					}
+				},
+			],
+		},
+		{
 			label: "Debug",
 			submenu: [
 				{
@@ -62,8 +93,9 @@ function createWindow () {
 					accelerator: 'Cmd+I',
 					click: ()=> {
 						//metrics = new Metrics("/Users/marcfervil/Documents/School/Software Testing/JSMetrics/Project/wey-master");
-						menuReply.reply('metrics', "/Users/marcfervil/Documents/School/Software Testing/JSMetrics/Project/wey-master", "view1");
-						menuReply.reply('metrics', "/Users/marcfervil/Documents/School/Software Testing/JSMetrics/Project/wey-master/lib/view", "view2");
+						menuReply.reply('metrics', "/Users/marcfervil/Documents/School/Software Testing/JSMetrics/Project/wey-master", "project");
+						//menuReply.reply('metrics', "/Users/marcfervil/Documents/School/Software Testing/JSMetrics/Project/wey-master/lib/model", "view1");
+						// menuReply.reply('metrics', "/Users/marcfervil/Documents/School/Software Testing/JSMetrics/Project/wey-master/lib/view", "view2");
 					}
 				},
 				{

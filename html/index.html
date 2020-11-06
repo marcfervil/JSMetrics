@@ -26,7 +26,7 @@
 
 			<div v-else-if="view==3" class="app">
 				<filebrowser style="grid-column: 1;grid-row: 1/5;" v-bind:project="projectMetrics"></filebrowser>
-				<metricsGraph :project="projectMetrics" :package1="metricViews.view1" :package2="metricViews.view2"  metric="LOC" class="metricsViewer fillHeight bottomFull"></metricsGraph>
+				<metricsGraph :project="projectMetrics" :package1="metricViews.view1" :package2="metricViews.view2"  :metric="graphMetric" class="metricsViewer fillHeight bottomFull"></metricsGraph>
 				<metrics class="metricsViewer fillHeight halfLeft pullUp" v-bind:metric-data="metricViews.view1"></metrics>
 				<metrics class="metricsViewer fillHeight halfRight pullUp" v-bind:metric-data="metricViews.view2"></metrics>
 			</div>
@@ -199,7 +199,8 @@
 		el: '#app',
 		data: {
 			projectMetrics: null,
-			view: 3,
+			view: 1,
+			graphMetric: null,
 			metricViews : {
 				view1: null,
 				view2: null
@@ -219,17 +220,22 @@
 
 
 
-
+	ipcRenderer.on('graph', (event, metric) => {
+		mainApp.graphMetric = metric;
+		mainApp.view = 3;
+	});
 
 	ipcRenderer.on('metrics', (event, metricPath, view) => {
 		//console.log("beans");
 	//	console.log(arg);
-		//console.log(view);
-  		if(mainApp.projectMetrics == null) {
+		console.log(view);
+  		if(view == "project") {
 			mainApp.projectMetrics = new Metrics(metricPath, true);
+			mainApp.metricViews["view1"] = mainApp.projectMetrics.explorePackage(metricPath);
+		}else{
+			mainApp.metricViews[view] = mainApp.projectMetrics.explorePackage(metricPath);
+			if(view=="view2" && mainApp.view==1) mainApp.view=2;
 		}
 
-		mainApp.metricViews[view] = mainApp.projectMetrics.explorePackage(metricPath);
-		if(view=="view2" && mainApp.view==1) mainApp.view=2;
 	});
 </script>

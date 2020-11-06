@@ -11,7 +11,7 @@
 		template: `
 
 
-         <div class="bubble" style="width:25%; height:60%;padding:25px;padding-right:30px;position:relative;z-index:-100; ">
+         <div class="bubble" style="width:100%; height:60%;padding:25px;padding-right:30px;z-index:-100; ">
 
                <!--This is dumb, but CSS is dumber. -->
 
