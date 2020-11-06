@@ -5,6 +5,7 @@
 		<meta charset="UTF-8">
 		<title>JSMetrics</title>
 		<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
 		<link rel="stylesheet" href="../html/style.css">
 
 	</head>
@@ -130,7 +131,7 @@
 
 				<div class="appHeading">
 					<h1 v-if="metricData!=null">{{fileFromPath(metricData.files.path)}} metrics</h1>
-					<h1 v-else>JSMetrics</h1>
+					<h1 v-else><i class="fas fa-align-left"></i> About JSMetrics</h1>
 				</div>
 
 				<div v-if="metricData!=null" class="metricsContent">
@@ -172,7 +173,7 @@
 				<div class="appHeading2">
 					<h1 style="opacity: 0.4;">Files</h1>
 				</div>
-				<div style="flex: 1;overflow-x: scroll;padding:10px">
+				<div style="flex: 1;overflow-x: scroll;padding:15px">
 					<package v-if="project!=null" style="margin-left:25px;"  v-bind:file-data="project.files"></package><br>
 					<div v-if="project==null" style="opacity: 0.4;">
 						<h3 style="margin:0;padding:0;">You don't have a project open!</h3><br>

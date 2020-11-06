@@ -12,7 +12,7 @@
 			<div style="border-top: 2px solid #332940">
 
             <div class="appHeading">
-               <h1 v-if="package1!=undefined && package2!=undefined">{{metric}} Graph</h1>
+               <h1 v-if="package1!=undefined && package2!=undefined"><i class="fas fa-chart-line"></i>   {{metric}} Graph</h1>
 					<h1 v-else>Now What?</h1>
             </div>
             <div v-if="package1!=undefined && package2!=undefined" class="metricsContent graphView" style="opacity:2">

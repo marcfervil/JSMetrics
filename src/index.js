@@ -138,7 +138,7 @@ function selectFile(){
 			console.log("path: "+path);
 
 			//let metrics = new Metrics(path);
-			menuReply.reply('metrics', path);
+			menuReply.reply('metrics', path, "project" );
 		}
 	});
 }
@@ -158,7 +158,7 @@ ipcMain.on('rightClick', async function(event, mousePos, file) {
 
 	const menu = new Menu()
 	const currentTab = new MenuItem({
-		label: 'Open In Current Tab',
+		label: 'Open In Tab 1',
 		click: () => {
 			//win.inspectElement(arg.x, arg.y)
 			console.log(file);
@@ -166,7 +166,7 @@ ipcMain.on('rightClick', async function(event, mousePos, file) {
 		}
 	});
 	const newTab = new MenuItem({
-		label: 'Open In New Tab',
+		label: 'Open In Tab 2',
 		click: () => {
 			event.reply("metrics", file, "view2");
 		}
